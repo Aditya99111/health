@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Button, Image, StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function CenterScreen() {
-  const [assurity, setAssurity] = useState('');
+const CenterScreen = ({ navigation }) => {
   const [result, setResult] = useState('');
   const [image, setImage] = useState(null);
 
   useEffect(() => {
     (async () => {
       if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
           alert('Sorry, we need camera roll permissions to make this work!');
         }
@@ -18,43 +17,53 @@ export default function CenterScreen() {
     })();
   }, []);
 
+  const getRandomResult = () => 'Positive';
+
+
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    let result = getRandomResult();
+
+    let pickedImage = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    console.log(result);
+    if (!pickedImage.cancelled) {
+      setImage(pickedImage.uri);
 
-    if (!result.cancelled) {
-      setImage(result.uri);
-      setResult('');
+      // Simulate result after 3 seconds
       setTimeout(() => {
-        fetch('https://adityamittl.pythonanywhere.com/result')
-          .then((response) => response.json())
-          .then((data) => {
-            setResult(data.result);
-            setAssurity(data.assurity);
-          })
-          .catch((error) => console.error(error));
-      }, 2000);
+        setResult(result);
+
+        // If the result is positive, navigate to the "Consult" screen after an additional second
+        if (result === 'Positive') {
+          setTimeout(() => {
+            navigation.navigate('Consult');
+          }, 1000);
+        }
+      }, 3000);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Pneumonia detection</Text>
-      <Text style={styles.subheading}>Upload a image of your chest X-ray</Text>
+      <Text style={styles.heading}>Pneumonia Detection</Text>
+      <Text style={styles.subheading}>Upload an image of your chest X-ray</Text>
 
       <Button title="Pick an image from camera roll" onPress={pickImage} />
       {image && <Image source={{ uri: image }} style={{ width: 300, height: 300, margin: 20 }} />}
 
       {result !== '' && <Text style={styles.text}>Result: {result}</Text>}
+      {result === 'Positive' && (
+        <View>
+        <Text>Please consult a doctor</Text>
+        <Button title="Book Slot" onPress={() => navigation.navigate('ConsultScreen')} />
+      </View>)}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -78,3 +87,5 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 });
+
+export default CenterScreen;

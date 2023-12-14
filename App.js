@@ -8,6 +8,7 @@ import SettingsScreen from './screens/GamesScreen';
 import ReportScreen from './screens/ReportScreen';
 import ProfileScreen from './screens/ChatScreen';
 import QuizScreen from './screens/CenterScreen';
+import ConsultScreen from './screens/ConsultScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
@@ -37,9 +38,10 @@ function LoadingScreen() {
       </View>
     );
   }
+
   return (
     <NavigationContainer>
-      <Tab.Navigator 
+      <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName;
@@ -89,8 +91,14 @@ function LoadingScreen() {
         <Tab.Screen name="Games" component={SettingsScreen} />
         <Tab.Screen name="X-ray" component={QuizScreen} />
         <Tab.Screen name="Reports" component={ReportScreen} />
+        <Tab.Screen
+          name="Consult"
+          component={ConsultScreen}
+          options={{ tabBarButton: () => null, tabBarVisible: false }}
+        />
+
         <Tab.Screen name="Chat" component={ProfileScreen} />
-        <Tab.Screen name="Results" component={ResultsScreen}     options={{ tabBarButton: () => null, tabBarVisible: false }}/>
+        <Tab.Screen name="Results" component={ResultsScreen} options={{ tabBarButton: () => null, tabBarVisible: false }} />
 
       </Tab.Navigator>
     </NavigationContainer>
@@ -118,6 +126,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 999,
   },
+  hidden: {
+    display: "none",
+  }
 
 
 });
